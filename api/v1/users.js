@@ -7,12 +7,29 @@ var URI = '/' + VERSION + '/' + RESOURCE_NAME;
 
 // Setup the vacations db
 var db = require('../../db/users')
-
+var memoryCache = require("memory-cache");
+var cache = (duration) => {
+    return (req, res, next) => {
+        let key = "_express_" + req.originalUrl || req.url;
+        let cachedBody = memoryCache.get(key);
+        if (cachedBody) {
+            res.send(cachedBody);
+            return;
+        } else {
+            res.sendResponse = res.send;
+            res.send = (body) => {
+                memoryCache.put(key, body, duration * 1000);
+                res.sendResponse(body);
+            };
+            next();
+        }
+    };
+};
 
 module.exports = function (router) {
     'use strict';
 
-    router.route(URI).get(function (req, res, next) {
+    router.route(URI).get(cache(60), function (req, res, next) {
         console.log("GET Users")
 
         //1. fields

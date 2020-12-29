@@ -12,6 +12,25 @@ var apiErrors = require('../../util/errors')
 var apiMessages = require('../../util/messages')
 
 
+var memoryCache = require("memory-cache");
+var cache = (duration) => {
+    return (req, res, next) => {
+        let key = "_express_" + req.originalUrl || req.url;
+        let cachedBody = memoryCache.get(key);
+        if (cachedBody) {
+            res.send(cachedBody);
+            return;
+        } else {
+            res.sendResponse = res.send;
+            res.send = (body) => {
+                memoryCache.put(key, body, duration * 1000);
+                res.sendResponse(body);
+            };
+            next();
+        }
+    };
+};
+
 module.exports = function (router) {
     'use strict';
 
@@ -19,7 +38,7 @@ module.exports = function (router) {
     // Active = validTill >= Today's date
 
     //    /v1/Vacations
-    router.route(URI).get(function (req, res, next) {
+    router.route(URI).get(cache(60), function (req, res, next) {
         console.log("GET Products")
         //1. Setup query riteria for the active pacakages
         var criteria = { price: { $gt: 100 } }

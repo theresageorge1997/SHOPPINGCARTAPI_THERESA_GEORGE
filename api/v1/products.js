@@ -11,6 +11,7 @@ var db = require('../../db/products')
 var apiErrors = require('../../util/errors')
 var apiMessages = require('../../util/messages')
 
+
 module.exports = function (router) {
     'use strict';
 
@@ -35,6 +36,7 @@ module.exports = function (router) {
                     res.status(404)
                 }
                 console.log("Retrieved products = %d", docs.length)
+                res.set("Cache-control", "public, max-age=60");
                 res.send(docs)
             }
         });
@@ -84,29 +86,29 @@ var processMongooseErrors = function (message, method, endpoint, err, payload) {
 /**
  * Converts Mongoose errors to API specific errors
  */
-var processValidationErrors = function (err) {
-    var errorList = []
-    // Check if there is an issue with the Num of Nights
-    if (err.errors.numberOfNights) {
-        if (err.errors.numberOfNights.kind === apiErrors.kinds.MIN_ERROR
-            || err.errors.numberOfNights.kind === apiErrors.kinds.MAX_ERROR
-            || err.errors.numberOfNights.kind === apiErrors.kinds.NUMBER_ERROR) {
-            errorList.push(apiErrors.errors.FORMAT_NUM_OF_NIGHTS)
-        }
-    }
-    // Check if name of the package is missing
-    if (err.errors.name) {
-        if (err.errors.name.kind === apiErrors.kinds.REQUIRED) {
-            errorList.push(apiErrors.errors.MISSING_PACKAGE_NAME)
-        }
-    }
+// var processValidationErrors = function (err) {
+//     var errorList = []
+//     // Check if there is an issue with the Num of Nights
+//     if (err.errors.numberOfNights) {
+//         if (err.errors.numberOfNights.kind === apiErrors.kinds.MIN_ERROR
+//             || err.errors.numberOfNights.kind === apiErrors.kinds.MAX_ERROR
+//             || err.errors.numberOfNights.kind === apiErrors.kinds.NUMBER_ERROR) {
+//             errorList.push(apiErrors.errors.FORMAT_NUM_OF_NIGHTS)
+//         }
+//     }
+//     // Check if name of the package is missing
+//     if (err.errors.name) {
+//         if (err.errors.name.kind === apiErrors.kinds.REQUIRED) {
+//             errorList.push(apiErrors.errors.MISSING_PACKAGE_NAME)
+//         }
+//     }
 
-    // Check if description of the package is missing
-    if (err.errors.description) {
-        if (err.errors.description.kind === apiErrors.kinds.REQUIRED) {
-            errorList.push(apiErrors.errors.MISSING_PACKAGE_DESCRIPTION)
-        }
-    }
+//     // Check if description of the package is missing
+//     if (err.errors.description) {
+//         if (err.errors.description.kind === apiErrors.kinds.REQUIRED) {
+//             errorList.push(apiErrors.errors.MISSING_PACKAGE_DESCRIPTION)
+//         }
+//     }
 
-    return errorList;
-}
+//     return errorList;
+// }

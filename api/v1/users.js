@@ -8,6 +8,7 @@ var URI = '/' + VERSION + '/' + RESOURCE_NAME;
 // Setup the vacations db
 var db = require('../../db/users')
 
+
 module.exports = function (router) {
     'use strict';
 
@@ -52,7 +53,7 @@ module.exports = function (router) {
                 // 4. Set the Link header - Left as an exercise for the students
                 // Link : <url-to-next-page>; rel="next",
                 //        <url-to-last-page>; rel="last"
-
+                res.set("Cache-control", "public, max-age=60");
                 res.send(docs)
             }
         });

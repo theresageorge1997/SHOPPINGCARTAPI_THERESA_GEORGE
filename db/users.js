@@ -5,6 +5,15 @@ var model = require('../models/users')
 var settings = require('./settings')
 
 
+exports.save = function (data, callback) {
+
+    new model.Users(data).save(function (err, inserted) {
+        callback(err, inserted)
+
+    })
+}
+
+
 // CREATE multiple vacation packages
 exports.saveMany = function (rows, callback) {
     model.Users.insertMany(rows, function (err, docs) {

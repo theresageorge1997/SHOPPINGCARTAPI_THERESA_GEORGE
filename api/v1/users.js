@@ -75,6 +75,26 @@ module.exports = function (router) {
             }
         });
     });
+
+    router.route(URI).post(function (req, res, next) {
+        console.log("POST  Users")
+
+        //1. Get the data
+        var doc = req.body;
+
+        //2. Call the insert method
+        db.save(doc, function (err, saved) {
+            if (err) {
+                // Creates the error response
+                // EARLIER it was >>>  res.status(400).send("err")
+                var userError = processMongooseErrors(apiMessages.errors.API_MESSAGE_CREATE_FAILED, "POST", URI, err, {});
+                res.setHeader('content-type', 'application/json')
+                res.status(400).send(userError)
+            } else {
+                res.send(saved)
+            }
+        });
+    });
 }
 
 // Utility function to create the JSON
